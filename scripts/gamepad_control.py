@@ -21,6 +21,8 @@ class GamepadControl:
         self.abs_x = 128  
         self.abs_y = self.abs_z = -128 
 
+        self.cmdlist = []
+
         # Control flags
         self.MOBILE_BASE_FLAG = False
         self.ARM_FLAG = False
@@ -87,6 +89,19 @@ class GamepadControl:
 
         self.gamepad_cmds_prev = gamepad_cmds
         return gamepad_cmds
+
+
+    def monitor_gamepad(self):
+        """ Continuously reads gamepad inputs and stores the latest command. """
+        try:
+            while True:
+                if len(self.cmdlist) > 4:
+                    self.cmdlist.pop(0)  # Retain only the latest two commands
+                self.cmdlist.append(self.get_gamepad_cmds())
+                time.sleep(0.005)
+        except KeyboardInterrupt:
+            print("[INFO] Gamepad monitoring stopped.")
+
 
     def _handle_event(self, event):
         """Handles individual gamepad events and updates internal state."""

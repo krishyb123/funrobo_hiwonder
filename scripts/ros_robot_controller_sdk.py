@@ -115,7 +115,7 @@ class Board:
         self.pwm_servo_read_lock = threading.Lock()
         
         self.sys_queue = queue.Queue(maxsize=1)
-        self.bus_servo_queue = queue.Queue(maxsize=1)
+        self.bus_servo_queue = queue.Queue(maxsize=50) # increased the queue size from 1
         self.pwm_servo_queue = queue.Queue(maxsize=1)
         self.key_queue = queue.Queue(maxsize=1)
         self.imu_queue = queue.Queue(maxsize=1)
@@ -444,6 +444,27 @@ class Board:
             data.extend(struct.pack("<BH", i[0], i[1]))
         self.buf_write(PacketFunction.PACKET_FUNC_BUS_SERVO, data)
 
+    # def bus_servo_read_and_unpack(self, servo_id, cmd, unpack):
+    #     with self.servo_read_lock:
+    #         count = 0
+    #         while True:
+    #             self.buf_write(PacketFunction.PACKET_FUNC_BUS_SERVO, [cmd, servo_id])
+    #             try:
+    #                 data = self.bus_servo_queue.get(block=True, timeout=0.1)
+    #                 break
+    #             except queue.Empty:
+    #                 count += 1
+    #                 if count > self.retry_times:
+    #                     data = None
+    #                     break
+    #         if data is not None:
+    #             servo_id, cmd, success, *info = struct.unpack(unpack, data)
+    #             if success == 0:
+    #                 return info
+    #             else:
+    #                 return None
+    #         else:
+    #             return None
     def bus_servo_read_and_unpack(self, servo_id, cmd, unpack):
         with self.servo_read_lock:
             count = 0
@@ -455,13 +476,24 @@ class Board:
                 except queue.Empty:
                     count += 1
                     if count > self.retry_times:
+                        print(f"[READ TIMEOUT] servo={servo_id} cmd=0x{cmd:02X}")
                         data = None
                         break
+
             if data is not None:
-                servo_id, cmd, success, *info = struct.unpack(unpack, data)
+                try:
+                    r_servo_id, r_cmd, success, *info = struct.unpack(unpack, data)
+                except Exception as e:
+                    print(f"[READ UNPACK ERROR] servo={servo_id} cmd=0x{cmd:02X} err={e}")
+                    return None
+
                 if success == 0:
                     return info
                 else:
+                    print(
+                        f"[READ ERROR] req_servo={servo_id} req_cmd=0x{cmd:02X} "
+                        f"rep_servo={r_servo_id} rep_cmd=0x{r_cmd:02X} success={success}"
+                    )
                     return None
             else:
                 return None

@@ -31,7 +31,7 @@ def monitor_gamepad():
             if len(cmdlist) > 2:
                 cmdlist.pop(0)  # Retain only the latest two commands
             cmdlist.append(gpc.get_gamepad_cmds())
-            time.sleep(0.001)
+            time.sleep(0.01)
     except KeyboardInterrupt:
         print("[INFO] Gamepad monitoring stopped.")
 
@@ -41,7 +41,7 @@ def shutdown_robot():
 
     # Stop motors and reset servos to a safe position
     # robot.stop_motors()
-    robot.set_joint_values(robot.home_position, duration=600)
+    robot.set_joint_values(robot.home_position, duration=2)
     time.sleep(1.5)  # Allow time for servos to reposition
 
     # Close communication interfaces
@@ -52,6 +52,9 @@ def shutdown_robot():
     print("[INFO] Shutdown complete. Safe to power off.")
 
 
+def map_range(x, amin_max, xmin_max):
+        return (x - xmin_max[0]) * (amin_max[1] - amin_max[0]) / (xmin_max[1] - xmin_max[0]) + amin_max[0]
+
 def main():
     """ Main loop that reads gamepad commands and updates the robot accordingly. """
     try:
@@ -59,7 +62,12 @@ def main():
         gamepad_thread = threading.Thread(target=monitor_gamepad, daemon=True)
         gamepad_thread.start()
         
-        control_interval = 0.25  # Seconds per control cycle
+        control_interval = 0.04  # Seconds per control cycle
+        # control_interval = 0.25
+
+        # robot.set_joint_values([0, 0, 90, -30, 0, 0], duration=0.25, radians=False)
+        # duration = 1 #seconds
+        # t = 0
         
         while True:
             cycle_start = time.time()
@@ -71,7 +79,17 @@ def main():
                 
                 robot.set_robot_commands(latest_cmd)
 
+
+            # move in a predefined time interval
+            # if t < duration:
+            #     th = map_range(t, [0, 90], [0, duration]) * 12/9
+            # robot.set_joint_values([th, 0, 90, -30, 0, 0], duration=0.04, radians=False)
+            # print(f't = {t}, theta = {th}')
+            
+
             elapsed = time.time() - cycle_start
+            # print(f'Time elapsed: {elapsed}')
+            # t += elapsed
             remaining_time = control_interval - elapsed
             if remaining_time > 0:
                 time.sleep(remaining_time)
