@@ -34,6 +34,11 @@ class HiwonderRobot:
             [-120, 120], [-90, 90], [-120, 120],
             [-100, 100], [-90, 90], [-120, 30]
         ]
+        # Robot base constants
+        self.wheel_radius = 0.047  # meters
+        self.base_length_x = 0.096  # meters
+        self.base_length_y = 0.105  # meters
+
         self.home_position = [0, 0, 90, -30, 0, 0] # degrees
 
         self.read_hz = 5
@@ -51,6 +56,28 @@ class HiwonderRobot:
         self.initialize_robot()
     
  
+    def set_wheel_speeds(self, speedlist: list):
+        """ Computes wheel speeds based on joystick input and sends them to the board """
+        """
+        motor3 w0|  ↑  |w1 motor1
+                 |     |
+        motor4 w2|     |w3 motor2
+        
+        """
+        # Convert to hardware speed range (-100 to 100)
+        # speed = [w * 8.4 for w in speedlist]
+        
+        # print(f"[DEBUG] Wheel speeds (rad/s): {speed}")
+
+        wheel_speeds = []
+        for wheel_id, speed in enumerate(speedlist, start=1):
+            wheel_speeds.append([wheel_id, speed*8.4])
+        
+        print(f"[DEBUG] Wheel speeds (rad/s): {wheel_speeds}")
+        
+        # Send speeds to motors
+        self.board.set_motor_speed(wheel_speeds)
+        
 
     def set_joint_values(self, thetalist: list, duration=1, radians=False):
         """Moves all arm joints to the given angles.

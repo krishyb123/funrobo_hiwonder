@@ -21,6 +21,10 @@ def joystick_control(robot, dt, new_thetalist):
     # get the latest gamepad command
     cmd = robot.gamepad.cmdlist[-1]
 
+    # ----------------------------------------------------------------------
+    # Arm joint control
+    # ----------------------------------------------------------------------
+
     max_rate = 400  # 400 x 0.1 = 40 deg/s
     
     new_thetalist[0] += dt * max_rate * cmd.arm_j1
@@ -32,11 +36,28 @@ def joystick_control(robot, dt, new_thetalist):
 
     new_thetalist = robot.enforce_joint_limits(new_thetalist)
     new_thetalist = [round(theta,3) for theta in new_thetalist]
-    print(f'[DEBUG] Current thetalist (deg) = {robot.get_joint_values()}') 
-    print(f'[DEBUG] Commanded thetalist (deg) = {new_thetalist}')       
+    # print(f'[DEBUG] Current thetalist (deg) = {robot.get_joint_values()}') 
+    # print(f'[DEBUG] Commanded thetalist (deg) = {new_thetalist}')       
     
     # set new joint angles
     robot.set_joint_values(new_thetalist, duration=dt, radians=False)
+
+    # ----------------------------------------------------------------------
+    # base veocity control
+    # ----------------------------------------------------------------------
+
+    vx, vy, w = cmd.base_vx, cmd.base_vy, cmd.base_w
+
+    print(f'gamepad cmd: {[cmd.base_vx, cmd.base_vy, cmd.base_w]}')
+    # print(f'gamepad cmd: {[cmd]}')
+
+    # Compute wheel speeds
+    w0 = (vx - vy - w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius
+    w1 = (vx + vy + w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius
+    w2 = (vx + vy - w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius
+    w3 = (vx - vy + w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius
+
+    robot.set_wheel_speeds([w0, w1, w2, w3])
 
 
 
