@@ -5,18 +5,11 @@ Main Application Script
 Coordinates gamepad input and robot control.
 """
 
-import sys, os
 import time
-import threading
 import traceback
 import numpy as np
 
-# Extend system path to include script directory
-sys.path.append(os.path.join(os.getcwd(), 'scripts'))
-
-from hiwonder import HiwonderRobot
-import utils
-
+from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
 
 
@@ -38,12 +31,8 @@ def main():
         PERIOD = 6.0                 # seconds per cycle (smooth)   
 
         while True:
+
             t_start = time.time()
-
-            # if robot.gamepad.cmdlist:
-            #     print(f'Gamepad cmd: {robot.gamepad.cmdlist[-1]}')
-
-
             now = time.time()
             t = now - t0
             if t >= DURATION:
@@ -53,7 +42,6 @@ def main():
             angles = []
             for i in range(6):
                 theta = OFFSETS[i] + AMPS[i] * np.sin(2.0 * np.pi * t / PERIOD + PHASES[i])
-                # theta = clamp(theta, *LIMITS[i])
                 angles.append(theta)
 
             robot.set_joint_values(angles, duration=dt)

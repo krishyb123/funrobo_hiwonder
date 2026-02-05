@@ -5,34 +5,25 @@ Main Application Script
 Coordinates gamepad input and robot control.
 """
 
-import sys, os
+
 import time
 import traceback
-import numpy as np
 import cv2
 
-# Extend system path to include script directory
-sys.path.append(os.path.join(os.getcwd(), 'scripts'))
+from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
-from hiwonder import HiwonderRobot
-from arm_models import FiveDOFRobot
-import utils as ut
-
-
-# Initialize components
-robot = HiwonderRobot()
-model = FiveDOFRobot()
 
 
 class CameraExampleFSM():
-    def __init__(self, dt=0.05):
+    def __init__(self, dt=0.05, robot=None):
         self.t = 0.0
         self.dt = dt
+        self.robot = robot
         self.camera = cv2.VideoCapture(0)
         self.new_thetalist = robot.get_joint_values().copy()
 
     def js_control(self):
-        cmd = robot.gamepad.cmdlist[-1]
+        cmd = self.robot.gamepad.cmdlist[-1]
 
         max_rate = 400  # 400 x 0.1 = 40 deg/s
         self.new_thetalist[0] += self.dt * max_rate * cmd.arm_j1
@@ -42,11 +33,11 @@ class CameraExampleFSM():
         self.new_thetalist[4] += self.dt * max_rate * cmd.arm_j5
         self.new_thetalist[5] += self.dt * max_rate * cmd.arm_ee
 
-        self.new_thetalist = robot.enforce_joint_limits(self.new_thetalist)
+        self.new_thetalist = self.robot.enforce_joint_limits(self.new_thetalist)
         self.new_thetalist = [round(theta,3) for theta in self.new_thetalist]   
         
         # set new joint angles
-        robot.set_joint_values(self.new_thetalist, duration=self.dt, radians=False)
+        self.robot.set_joint_values(self.new_thetalist, duration=self.dt, radians=False)
 
 
     def process_image(self):
@@ -77,11 +68,14 @@ def main():
     """ Main loop that reads gamepad commands and updates the robot accordingly. """
     try:
        
+       # Initialize components
+        robot = HiwonderRobot()
+
         control_hz = 20 
         dt = 1 / control_hz
         t0 = time.time()
 
-        fsm = CameraExampleFSM(dt=dt)
+        fsm = CameraExampleFSM(dt=dt, robot=robot)
 
         while True:
             t_start = time.time()
@@ -92,7 +86,6 @@ def main():
 
             if robot.gamepad.cmdlist:
                 fsm.step()
-
 
             elapsed = time.time() - t_start
             remaining_time = dt - elapsed

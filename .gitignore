@@ -1,2 +1,7 @@
-/venv
-__pycache__
+__pycache__/
+*.egg-info
+solutions/
+tests/solutions/
+.pytest_cache
+TODO.md
+funrobo_hiwonder.egg-info

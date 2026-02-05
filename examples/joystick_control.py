@@ -1,20 +1,9 @@
-# main.py
-"""
-Main Application Script
-----------------------------
-Coordinates gamepad input and robot control.
-"""
 
-import sys, os
 import time
 import traceback
-import numpy as np
 
-# Extend system path to include script directory
-sys.path.append(os.path.join(os.getcwd(), 'scripts'))
+from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
-from hiwonder import HiwonderRobot
-import utils
 
 
 def joystick_control(robot, dt, new_thetalist):
@@ -49,7 +38,6 @@ def joystick_control(robot, dt, new_thetalist):
     vx, vy, w = cmd.base_vx, cmd.base_vy, cmd.base_w
 
     print(f'gamepad cmd: {[cmd.base_vx, cmd.base_vy, cmd.base_w]}')
-    # print(f'gamepad cmd: {[cmd]}')
 
     # Compute wheel speeds
     w0 = (vx - vy - w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius
@@ -71,7 +59,7 @@ def main():
         control_hz = 20 
         dt = 1 / control_hz
 
-        thetalist = robot.get_joint_values().copy()
+        joint_values = robot.get_joint_values().copy()
 
         while True:
             t_start = time.time()
@@ -81,7 +69,7 @@ def main():
                 break
 
             if robot.gamepad.cmdlist:
-                joystick_control(robot, dt, thetalist)
+                joystick_control(robot, dt, joint_values)
 
 
             elapsed = time.time() - t_start
@@ -104,5 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
