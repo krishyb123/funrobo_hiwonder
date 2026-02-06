@@ -5,3 +5,4 @@ tests/solutions/
 .pytest_cache
 TODO.md
 funrobo_hiwonder.egg-info
+.lgd*

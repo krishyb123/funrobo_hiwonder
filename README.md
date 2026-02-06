@@ -12,7 +12,7 @@ NOTE: This branch is to be used with the version of the robot that's using the *
 
 #### Step 0: Connect to Raspberry Pi over SSH
 - Run `ssh funrobot@funrobot#.local` in terminal, replacing `#` with the number of your SD card.
-  [Find your SD card number](https://docs.google.com/spreadsheets/d/1oiZmZgGmFAW9nbCus0FoESnCpqEN_4TZb9X0I5U4Vjc/).
+  [Find your SD card number](https://docs.google.com/spreadsheets/d/1j3MaXrLvoURn6myrdkA8uJrGIvR5390YH9Bjby1ctJQ/edit?usp=sharing).
   **The password is `FunR0b0!`** 
 - SSH troubleshooting:
   - Make sure you are connected to the Olin Robotics network (It should work on Olin, but Olin Robotics may be faster/more stable).

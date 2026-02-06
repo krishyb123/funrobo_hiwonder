@@ -1,4 +1,4 @@
-from hiwonder import HiwonderRobot
+from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 import time
 import traceback
 
@@ -23,10 +23,6 @@ def main():
 
             if case == 0:
                 try:
-                    # joint_id = int(input("Enter joint ID (1-6): ").strip())
-                    # #print(f"Position of joint {joint_id}: {robot.joint_values[joint_id]}")
-                    # print(f"Position of joint {joint_id}: {robot.get_joint_value(joint_id)}")
-                    robot.update_joint_values()
                     print(f"\nJoint values: {robot.get_joint_values()}")
                 except ValueError:
                     print("Invalid input. Please enter a valid joint ID.")
