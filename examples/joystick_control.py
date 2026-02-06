@@ -6,7 +6,7 @@ from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
 
 
-def joystick_control(robot, dt, new_thetalist):
+def joystick_control(robot, dt, new_joint_values):
     # get the latest gamepad command
     cmd = robot.gamepad.cmdlist[-1]
 
@@ -16,28 +16,27 @@ def joystick_control(robot, dt, new_thetalist):
 
     max_rate = 400  # 400 x 0.1 = 40 deg/s
     
-    new_thetalist[0] += dt * max_rate * cmd.arm_j1
-    new_thetalist[1] += dt * max_rate * cmd.arm_j2
-    new_thetalist[2] += dt * max_rate * cmd.arm_j3
-    new_thetalist[3] += dt * max_rate * cmd.arm_j4
-    new_thetalist[4] += dt * max_rate * cmd.arm_j5
-    new_thetalist[5] += dt * max_rate * cmd.arm_ee
+    new_joint_values[0] += dt * max_rate * cmd.arm_j1
+    new_joint_values[1] += dt * max_rate * cmd.arm_j2
+    new_joint_values[2] += dt * max_rate * cmd.arm_j3
+    new_joint_values[3] += dt * max_rate * cmd.arm_j4
+    new_joint_values[4] += dt * max_rate * cmd.arm_j5
+    new_joint_values[5] += dt * max_rate * cmd.arm_ee
 
-    new_thetalist = robot.enforce_joint_limits(new_thetalist)
-    new_thetalist = [round(theta,3) for theta in new_thetalist]
-    # print(f'[DEBUG] Current thetalist (deg) = {robot.get_joint_values()}') 
-    # print(f'[DEBUG] Commanded thetalist (deg) = {new_thetalist}')       
+    new_joint_values = robot.enforce_joint_limits(new_joint_values)
+    new_joint_values = [round(theta,3) for theta in new_joint_values]
+
+    print(f'[DEBUG] Commanded joint angles: [j1, j2, j3, j4, j5, ee]: {new_joint_values}')
+    print(f'-------------------------------------------------------------------------------------\n')    
     
     # set new joint angles
-    robot.set_joint_values(new_thetalist, duration=dt, radians=False)
+    robot.set_joint_values(new_joint_values, duration=dt, radians=False)
 
     # ----------------------------------------------------------------------
     # base veocity control
     # ----------------------------------------------------------------------
 
     vx, vy, w = cmd.base_vx, cmd.base_vy, cmd.base_w
-
-    print(f'gamepad cmd: {[cmd.base_vx, cmd.base_vy, cmd.base_w]}')
 
     # Compute wheel speeds
     w0 = (vx - vy - w * (robot.base_length_x + robot.base_length_y)) / robot.wheel_radius

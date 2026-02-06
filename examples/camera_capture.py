@@ -19,25 +19,26 @@ class CameraExampleFSM():
         self.t = 0.0
         self.dt = dt
         self.robot = robot
+        self.new_joint_values = robot.get_joint_values().copy()
         self.camera = cv2.VideoCapture(0)
-        self.new_thetalist = robot.get_joint_values().copy()
+        
 
     def js_control(self):
         cmd = self.robot.gamepad.cmdlist[-1]
 
         max_rate = 400  # 400 x 0.1 = 40 deg/s
-        self.new_thetalist[0] += self.dt * max_rate * cmd.arm_j1
-        self.new_thetalist[1] += self.dt * max_rate * cmd.arm_j2
-        self.new_thetalist[2] += self.dt * max_rate * cmd.arm_j3
-        self.new_thetalist[3] += self.dt * max_rate * cmd.arm_j4
-        self.new_thetalist[4] += self.dt * max_rate * cmd.arm_j5
-        self.new_thetalist[5] += self.dt * max_rate * cmd.arm_ee
+        self.new_joint_values[0] += self.dt * max_rate * cmd.arm_j1
+        self.new_joint_values[1] += self.dt * max_rate * cmd.arm_j2
+        self.new_joint_values[2] += self.dt * max_rate * cmd.arm_j3
+        self.new_joint_values[3] += self.dt * max_rate * cmd.arm_j4
+        self.new_joint_values[4] += self.dt * max_rate * cmd.arm_j5
+        self.new_joint_values[5] += self.dt * max_rate * cmd.arm_ee
 
-        self.new_thetalist = self.robot.enforce_joint_limits(self.new_thetalist)
-        self.new_thetalist = [round(theta,3) for theta in self.new_thetalist]   
+        self.new_joint_values = self.robot.enforce_joint_limits(self.new_joint_values)
+        self.new_joint_values = [round(theta,3) for theta in self.new_joint_values]
         
         # set new joint angles
-        self.robot.set_joint_values(self.new_thetalist, duration=self.dt, radians=False)
+        self.robot.set_joint_values(self.new_joint_values, duration=self.dt, radians=False)
 
 
     def process_image(self):
@@ -60,7 +61,7 @@ class CameraExampleFSM():
         self.js_control()
 
         self.t += self.dt
-        print(f'Time: [{self.t}]')
+        # print(f'Time: [{self.t}]')
 
 
 

@@ -78,13 +78,11 @@ class RobotV5():
         # Convert to hardware speed range (-100 to 100)
         # speed = [w * 8.4 for w in speedlist]
         
-        # print(f"[DEBUG] Wheel speeds (rad/s): {speed}")
-
         wheel_speeds = []
         for wheel_id, speed in enumerate(speedlist, start=1):
             wheel_speeds.append([wheel_id, speed*8.4])
         
-        print(f"[DEBUG] Wheel speeds (rad/s): {wheel_speeds}")
+        # print(f"[DEBUG] Wheel speeds (rad/s): {wheel_speeds}")
         
         # Send speeds to motors
         self.board.set_motor_speed(wheel_speeds)
