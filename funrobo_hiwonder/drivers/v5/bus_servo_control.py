@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import time
-from funrobo_hiwonder.core.bus_servo_control import *
+
+from funrobo_hiwonder.drivers.v5.ros_robot_controller_sdk import *
 
 if sys.version_info.major == 2:
     print('Please run this program with python3!')
