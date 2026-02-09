@@ -10,7 +10,8 @@ Your project development will be done onboard the Raspberry Pi ideally over **SS
 ## Setting up the onboard Raspberry Pi
 
 #### Step 0: Connect to the Raspberry Pi from your laptop over SSH
-TO BE ADDED
+The steps to connect to the Raspberry Pi are listed in this doc: [FunRobo SSH Guide](https://docs.google.com/document/d/1tcrt6ZgzxWQ3hjQ34bW16oa2WLRAk_C3NH0j8XwIweM/edit?usp=sharing)
+Sign up for a robot using the spreadsheet: [Robot Status](https://docs.google.com/spreadsheets/d/1j3MaXrLvoURn6myrdkA8uJrGIvR5390YH9Bjby1ctJQ/edit?usp=sharing)
 
   **The password is `FunR0b0!`** 
 
@@ -42,6 +43,7 @@ git clone <your funrobo_kinematics repo>
 ```bash
 cd funrobo_hiwonder
 conda env create -f environment.yml
+#May take time, especially if first time being run
 ```
 - Activate the environment
 ```bash
