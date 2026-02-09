@@ -71,3 +71,4 @@ python examples/joystick_control.py
 <img src = "media/jstick-manual-2.png" height="330">
 
 
+If the positions aren't updating, check if your terminal says "Logitech Logitech Dual Action" instead of "Logitech Gamepad F310". If that's the case, make sure the back of your controller is in the X position not the D position.
