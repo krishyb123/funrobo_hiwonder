@@ -10,7 +10,7 @@ import traceback
 
 from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
-from projects.mp1.five_dof import FiveDOFRobot
+from funrobo_kinematics.core.arm_models import FiveDOFRobotTemplate
 import funrobo_kinematics.core.utils as ut
 
 
@@ -21,7 +21,7 @@ def main():
 
         # Initialize components
         robot = HiwonderRobot()
-        model = FiveDOFRobot()
+        model = FiveDOFRobotTemplate()
         
         control_hz = 20 
         dt = 1 / control_hz
