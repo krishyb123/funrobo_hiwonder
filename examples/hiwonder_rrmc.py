@@ -8,10 +8,11 @@ Example code for the MP1 RRMC implementation
 import time
 import traceback
 
+import numpy as np
+
 from funrobo_hiwonder.core.hiwonder import HiwonderRobot
 
-from funrobo_kinematics.core.arm_models import FiveDOFRobotTemplate
-import funrobo_kinematics.core.utils as ut
+from funrobo_kinematics.projects.mp1.five_dof import FiveDOFRobot
 
 
 
@@ -21,11 +22,10 @@ def main():
 
         # Initialize components
         robot = HiwonderRobot()
-        model = FiveDOFRobotTemplate()
+        model = FiveDOFRobot()
         
         control_hz = 20 
         dt = 1 / control_hz
-        t0 = time.time()
 
         while True:
             t_start = time.time()
@@ -40,12 +40,17 @@ def main():
                 if cmd.arm_home:
                     robot.move_to_home_position()
 
-                curr_joint_values = robot.get_joint_values()
+                curr_joint_values = robot.get_joint_values()  # degrees, length 6 (5 arm + gripper)
 
+                # FiveDOFRobot expects radians, 5 joints (arm only). Hiwonder uses degrees, 6 joints.
+                curr_arm_rad = [np.deg2rad(j) for j in curr_joint_values[:5]]
                 vel = [cmd.arm_vx, cmd.arm_vy, cmd.arm_vz]
-                new_joint_values = model.calc_velocity_kinematics(curr_joint_values, vel)
+                new_arm_rad = model.calc_velocity_kinematics(curr_arm_rad, vel)
 
-                # set new joint angles
+                # Convert back to degrees and append gripper (unchanged)
+                new_arm_deg = [np.rad2deg(j) for j in new_arm_rad]
+                new_joint_values = new_arm_deg + [curr_joint_values[5]]
+
                 robot.set_joint_values(new_joint_values, duration=dt, radians=False)
 
             elapsed = time.time() - t_start
