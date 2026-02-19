@@ -326,7 +326,7 @@ class RobotV5(BaseRobot):
             joint_values = [np.rad2deg(theta) for theta in joint_values]
 
         joint_values = self.enforce_joint_limits(joint_values)
-        self.joint_values = joint_values.copy() # updates joint_values with commanded thetalist
+        # self.joint_values = joint_values.copy() # updates joint_values with commanded thetalist
         joint_values_hw = self.remap_joints(joint_values)
 
         positions = []
@@ -516,6 +516,7 @@ class RobotV36(BaseRobot):
             joint_values = [np.rad2deg(theta) for theta in joint_values]
 
         joint_values = self.enforce_joint_limits(joint_values)
+        self.joint_values = joint_values.copy() # updates joint_values with commanded thetalist
         joint_values_hw = self.remap_joints(joint_values)
 
         for joint_id, theta in enumerate(joint_values_hw, start=1):
